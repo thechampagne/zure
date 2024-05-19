@@ -1,5 +1,23 @@
 # zure
 
+<img align="left" style="width:290px" src="https://raw.githubusercontent.com/thechampagne/zure/main/.github/assets/logo.jpg" width="290px">
+
+**Rust regex**
+
+This library provides routines for searching strings for matches of a [regular expression](https://en.wikipedia.org/wiki/Regular_expression) (aka "regex").
+
+The regex syntax supported by this library is similar to other regex engines, but it lacks several features that are not known how to implement efficiently.
+
+This includes, but is not limited to, look-around and backreferences.
+
+In exchange, all regex searches in this library have worst case `O(m * n)` time complexity, where m is proportional to the size of the regex and `n` is proportional to the size of the string being searched.
+
+---
+
+<br>
+
+[![](https://img.shields.io/github/license/thechampagne/zure)](https://github.com/thechampagne/zure/blob/main/LICENSE)
+
 Zig binding for rust **regex** engine.
 
 ### Usage
