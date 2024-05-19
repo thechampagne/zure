@@ -51,14 +51,14 @@ pub const Regex = struct {
     }
 
     pub fn isMatch(zure: @This(), haystack: []const u8, start: usize) bool {
-        if (rure.rure_is_match(zure.rure, haystack, haystack.len, start)) return true;
+        if (rure.rure_is_match(zure.rure, haystack.ptr, haystack.len, start)) return true;
         return false;
     }
 
     pub fn find(zure: @This(), haystack: []const u8, start: usize) ?Match {
         var match: rure.rure_match = undefined;
         if (rure.rure_find(zure.rure,
-                           haystack,
+                           haystack.ptr,
                            haystack.len,
                            start,
                            &match)) {
@@ -70,14 +70,14 @@ pub const Regex = struct {
         return null;
     }
 
-    pub fn findCaptures(zure: @This(), haystack: []const u8, start: usize, captures: Captures) bool {
-        if (rure.rure_find_captures(zure.rure, haystack, haystack.len, start, captures.rure_captures)) return true;
+    pub fn findCaptures(zure: @This(), haystack: []const u8, start: usize, cap: Captures) bool {
+        if (rure.rure_find_captures(zure.rure, haystack.ptr, haystack.len, start, cap.rure_captures)) return true;
         return false;
     }
 
     pub fn shortestMatch(zure: @This(), haystack: []const u8,
                          start: usize, end: *usize) bool {
-        if (rure.rure_shortest_match(zure.rure, haystack,
+        if (rure.rure_shortest_match(zure.rure, haystack.ptr,
                                      haystack.len, start, end)) return true;
         return false;
     }
@@ -86,16 +86,16 @@ pub const Regex = struct {
         return rure.rure_capture_name_index(zure.rure, name.ptr);
     }
 
-    pub fn iterCaptureNamesInit(zure: @This()) RegexIterCaptureNames {
+    pub fn iterCaptureNames(zure: @This()) RegexIterCaptureNames {
         return .{ .rure_iter_capture_names = rure.rure_iter_capture_names_new(zure.rure)};
     }
 
-    pub fn iterInit(zure: @This()) RegexIter {
+    pub fn iter(zure: @This()) RegexIter {
         return .{.rure_iter = rure.rure_iter_new(zure.rure_iter)};
     }
 
-    pub fn capturesInit(zure: @This()) Captures {
-        return .{.rure_captures = rure.rure_captures_new(zure.rure_captures)};
+    pub fn captures(zure: @This()) Captures {
+        return .{.rure_captures = rure.rure_captures_new(zure.rure)};
     }
 
     pub fn stringFree(s: []u8) void {
@@ -110,6 +110,32 @@ pub const Regex = struct {
 
 const RegexSet = struct {
     rure_set: ?*rure.rure_set,
+
+    // pub fn compileSet(patterns: []const []const u8, flags: Flags,
+    //                options: ?Options, zure_error: ?Error) ?Regex {
+    //     var opt: ?*rure.rure_options = null;
+    //     if (options) |op| {
+    //         opt = op.rure_options;
+    //     }
+    //     var err: ?*rure.rure_error = null;
+    //     if (zure_error) |zerr| {
+    //         err = zerr.rure_error;
+    //     }
+    //     const re = rure.rure_compile_set(patterns.ptr,
+   
+    //                                  patterns.len,
+    //                                  flags,
+    //                                  opt,
+    //                                  err);
+    //     if (re) |r| {
+    //         return .{.rure = r};
+    //     }
+    //     return null;
+    // }
+
+    pub fn deinit(zure_set: @This()) void {
+        rure.rure_set_free(zure_set.rure_set);
+    }
 };
 
 const Options = struct {
@@ -140,7 +166,7 @@ const Match = struct {
 const Captures = struct {
     rure_captures: ?*rure.rure_captures,
 
-    pub fn capturesAt(zure_captures: @This(), i: usize) ?Match {
+    pub fn at(zure_captures: @This(), i: usize) ?Match {
         var match: rure.rure_match = undefined;
         if (rure.rure_captures_at(zure_captures.rure_captures,
                            i,
@@ -195,7 +221,14 @@ const RegexIter = struct {
 const RegexIterCaptureNames = struct {
     rure_iter_capture_names: ?*rure.rure_iter_capture_names,
 
-    // bool rure_iter_capture_names_next(rure_iter_capture_names *it, char **name);
+    pub fn next(zure_iter_capture_names: @This()) ?[]const u8 {
+        var name: [*]u8 = null;
+        if (rure.rure_iter_capture_names_next(zure_iter_capture_names.rure_iter_capture_names,
+                                                  &name)) {
+            return std.mem.span(name);
+        }
+        return null;
+    }
 
     pub fn deinit(zure_iter_capture_names: @This()) void {
         rure.rure_iter_capture_names_free(zure_iter_capture_names.rure_iter_capture_names);
