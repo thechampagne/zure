@@ -29,6 +29,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     unit_tests.root_module.addImport("zure", zure);
+    unit_tests.addLibraryPath(b.path("regex/target/release"));
     unit_tests.linkLibC();
     unit_tests.linkSystemLibrary("rure");
 
