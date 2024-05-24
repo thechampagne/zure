@@ -10,7 +10,7 @@ The regex syntax supported by this library is similar to other regex engines, bu
 
 This includes, but is not limited to, look-around and backreferences.
 
-In exchange, all regex searches in this library have worst case `O(m * n)` time complexity, where m is proportional to the size of the regex and `n` is proportional to the size of the string being searched.
+In exchange, all regex searches in this library have worst case `O(m * n)` time complexity, where `m` is proportional to the size of the regex and `n` is proportional to the size of the string being searched.
 
 ---
 
